@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: test-di
+  name: test-di
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: test-di
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: test-di
+    spec:
+      containers:
+      - image: quay.io/gfarache/keycloak-authz:latest
+        name: keycloak-authz
+        resources: {}
+        env:
+          - name: QUARKUS_OIDC_AUTH_SERVER_URL
+            value: https://keycloak-orchestrator.apps.cluster-x4swq.dynamic.redhatworkshops.io/realms/Orchestrator
+          - name: QUARKUS_OIDC_CLIENT_ID
+            value: data-index
+          - name: QUARKUS_OIDC_CREDENTIALS_SECRET
+            value: pHtAvBelJoW0XNkpVxTaEa6gknCauqAm
+          - name: QUARKUS_OIDC_TLS_VERIFICATION
+            value: none
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: test-di-service
+  namespace: sonataflow-infra
+spec:
+  ports:
+  - name: http
+    port: 80
+    protocol: TCP
+    targetPort: 8080
+  selector:
+    app: test-di
+  type: ClusterIP
+
